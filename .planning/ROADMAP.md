@@ -3,7 +3,7 @@
 ## Phases
 
 - [x] **Phase 1: Foundation & Authentication** - Establish secure core and user roles.
-- [ ] **Phase 2: Catalog Management** - Manage and search the physical inventory.
+- [x] **Phase 2: Catalog Management** - Manage and search the physical inventory.
 - [ ] **Phase 3: Member & Profile Management** - Manage library members and their access.
 - [ ] **Phase 4: Lending Logic & Concurrency** - Enable borrowing/returning with data integrity.
 - [ ] **Phase 5: Admin Dashboard & Statistics** - Provide operational oversight for librarians.
@@ -33,9 +33,9 @@
   2. Search endpoint returns relevant results by Title, Author, or ISBN in < 1s.
   3. Every book record shows correct "total" vs "available" quantity.
 **Plans**:
-- [ ] 02-01-PLAN.md — Catalog Foundation (Models & Authors)
-- [ ] 02-02-PLAN.md — Book Management (CRUD & ISBN Validation)
-- [ ] 02-03-PLAN.md — Search & Availability Tracking
+- [x] 02-01-PLAN.md — Catalog Foundation (Models & Authors)
+- [x] 02-02-PLAN.md — Book Management (CRUD & ISBN Validation)
+- [x] 02-03-PLAN.md — Search & Availability Tracking
 
 ### Phase 3: Member & Profile Management
 **Goal**: Manage user identities beyond authentication.
@@ -73,7 +73,7 @@
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Auth | 3/3 | Completed | 2026-06-12 |
-| 2. Catalog Management | 0/3 | In Progress | - |
+| 2. Catalog Management | 3/3 | Completed | 2026-06-14 |
 | 3. Member Management | 0/1 | Not started | - |
 | 4. Lending Logic | 0/1 | Not started | - |
 | 5. Admin Dashboard | 0/1 | Not started | - |
