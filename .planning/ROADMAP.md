@@ -44,7 +44,9 @@
 **Success Criteria** (what must be TRUE):
   1. Librarian can register a new student and assign library privileges.
   2. Student can view their own borrow history and current contact info.
-**Plans**: TBD
+**Plans**:
+- [ ] 03-01-PLAN.md — Member Registration & Roles
+- [ ] 03-02-PLAN.md — Student Profiles & History
 
 ### Phase 4: Lending Logic & Concurrency
 **Goal**: Implement the core borrow/return state machine with high integrity.
@@ -55,7 +57,10 @@
   2. Librarian can approve a request, creating an "Active" loan with a calculated due date.
   3. System prevents lending the same physical copy to two people simultaneously (verified via concurrency test).
   4. Librarian can record a return, which automatically restores book availability.
-**Plans**: TBD
+**Plans**:
+- [ ] 04-01-PLAN.md — Loan Request Workflow & Expiry
+- [ ] 04-02-PLAN.md — Loan Management & Concurrency
+- [ ] 04-03-PLAN.md — Return Logic & Fine Calculation
 
 ### Phase 5: Admin Dashboard & Statistics
 **Goal**: Provide operational oversight for librarians.
@@ -74,6 +79,6 @@
 |-------|----------------|--------|-----------|
 | 1. Foundation & Auth | 3/3 | Completed | 2026-06-12 |
 | 2. Catalog Management | 3/3 | Completed | 2026-06-14 |
-| 3. Member Management | 0/1 | Not started | - |
-| 4. Lending Logic | 0/1 | Not started | - |
+| 3. Member Management | 0/2 | Discussed | - |
+| 4. Lending Logic | 0/3 | Planned | - |
 | 5. Admin Dashboard | 0/1 | Not started | - |
