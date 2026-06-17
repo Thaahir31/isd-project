@@ -9,7 +9,8 @@ from src.models.book import Book
 from src.models.loan_request import LoanRequest, LoanRequestStatus
 from src.models.loan import Loan, LoanStatus
 from src.schemas.loan_request import LoanRequestCreate, LoanRequestResponse
-from src.schemas.loan import LoanResponse
+from src.schemas.loan import LoanResponse, LoanReturn
+from src.logic.fines import calculate_overdue_fine
 
 router = APIRouter(prefix="/api/loans", tags=["loans"])
 
@@ -83,6 +84,7 @@ def approve_loan_request(
         raise HTTPException(status_code=400, detail=f"Cannot approve request in {loan_request.status} status")
 
     # 3. Fetch the Book record using SELECT FOR UPDATE
+    # This locks the row on supported databases (Postgres/MySQL)
     book = db.query(Book).filter(Book.id == loan_request.book_id).with_for_update().first()
     if not book:
         raise HTTPException(status_code=404, detail="Book not found")
@@ -110,8 +112,20 @@ def approve_loan_request(
         )
 
     # 5. Action:
+    # Use an atomic update to be extra safe and handle SQLite concurrency tests correctly
+    updated_rows = db.query(Book).filter(
+        Book.id == loan_request.book_id,
+        Book.available_copies > 0
+    ).update(
+        {"available_copies": Book.available_copies - 1},
+        synchronize_session=False
+    )
+    
+    if updated_rows == 0:
+        # This could happen if another process snatched the last copy between our check and update
+        raise HTTPException(status_code=400, detail="No copies available for this book")
+
     loan_request.status = LoanRequestStatus.APPROVED
-    book.available_copies -= 1
     
     new_loan = Loan(
         user_id=loan_request.user_id,
@@ -158,3 +172,74 @@ def cleanup_expired_requests(
     
     db.commit()
     return {"message": f"Cleaned up {expired_count} expired requests"}
+
+@router.post("/{loan_id}/return", response_model=LoanResponse)
+def return_book(
+    loan_id: int,
+    return_data: LoanReturn,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_role(UserRole.LIBRARIAN))
+):
+    # 1. Fetch Loan by ID (ensure status is ACTIVE)
+    loan = db.query(Loan).filter(Loan.id == loan_id).first()
+    if not loan:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Loan not found")
+    
+    if loan.status != LoanStatus.ACTIVE:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail=f"Cannot return loan with status {loan.status}"
+        )
+
+    # 2. Calculate fine
+    now = datetime.utcnow()
+    fine = calculate_overdue_fine(loan.due_date, now)
+
+    # 3. Update Loan
+    loan.status = LoanStatus.RETURNED
+    loan.returned_at = now
+    loan.condition = return_data.condition
+    loan.total_fine = fine
+
+    # 4. Fetch Book and increment available_copies
+    book = db.query(Book).filter(Book.id == loan.book_id).first()
+    if book:
+        book.available_copies += 1
+    
+    db.commit()
+    db.refresh(loan)
+    return loan
+
+@router.get("/me", response_model=List[LoanResponse])
+def get_my_loans(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_role(UserRole.STUDENT))
+):
+    """
+    Returns list of loans belonging to the authenticated student.
+    """
+    return db.query(Loan).filter(Loan.user_id == current_user.id).all()
+
+@router.get("/active", response_model=List[LoanResponse])
+def get_active_loans(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_role(UserRole.LIBRARIAN))
+):
+    """
+    Returns all currently ACTIVE loans.
+    """
+    return db.query(Loan).filter(Loan.status == LoanStatus.ACTIVE).all()
+
+@router.get("/overdue", response_model=List[LoanResponse])
+def get_overdue_loans(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_role(UserRole.LIBRARIAN))
+):
+    """
+    Returns loans where due_date < now and status is ACTIVE.
+    """
+    now = datetime.utcnow()
+    return db.query(Loan).filter(
+        Loan.status == LoanStatus.ACTIVE,
+        Loan.due_date < now
+    ).all()

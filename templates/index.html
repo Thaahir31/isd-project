@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Library Management System</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --sidebar-bg: #0d1b2a;
+      --sidebar-hover: #1b2838;
+      --sidebar-active: #1e3a5f;
+      --accent: #2563eb;
+      --accent-light: #3b82f6;
+      --header-bg: #1a237e;
+      --content-bg: #f0f4f8;
+      --card-shadow: 0 2px 8px rgba(13, 27, 42, 0.08);
+    }
+
+    body {
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: var(--content-bg);
+      min-height: 100vh;
+    }
+
+    /* Login page */
+    #login-page {
+      min-height: 100vh;
+      background: linear-gradient(135deg, var(--sidebar-bg) 0%, var(--header-bg) 50%, #1565c0 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 420px;
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+
+    .login-header {
+      background: var(--header-bg);
+      color: #fff;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .login-header i {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+      opacity: 0.9;
+    }
+
+    .login-body {
+      padding: 2rem;
+      background: #fff;
+    }
+
+    .btn-login {
+      background: var(--header-bg);
+      border: none;
+      padding: 0.65rem;
+      font-weight: 600;
+    }
+
+    .btn-login:hover {
+      background: var(--accent);
+    }
+
+    /* App layout */
+    #app-page {
+      display: none;
+    }
+
+    .sidebar {
+      width: 260px;
+      min-height: 100vh;
+      background: var(--sidebar-bg);
+      color: #cbd5e1;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar-brand {
+      padding: 1.5rem 1.25rem;
+      background: var(--header-bg);
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .sidebar-brand i {
+      font-size: 1.5rem;
+    }
+
+    .sidebar-nav {
+      padding: 1rem 0;
+      flex: 1;
+    }
+
+    .sidebar-nav .nav-link {
+      color: #94a3b8;
+      padding: 0.75rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      border-left: 3px solid transparent;
+      transition: all 0.2s;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .sidebar-nav .nav-link:hover {
+      background: var(--sidebar-hover);
+      color: #e2e8f0;
+    }
+
+    .sidebar-nav .nav-link.active {
+      background: var(--sidebar-active);
+      color: #fff;
+      border-left-color: var(--accent-light);
+    }
+
+    .sidebar-nav .nav-link i {
+      font-size: 1.15rem;
+      width: 1.5rem;
+      text-align: center;
+    }
+
+    .sidebar-footer {
+      padding: 1rem 1.25rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .user-info {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      margin-bottom: 0.75rem;
+    }
+
+    .user-info strong {
+      color: #e2e8f0;
+      display: block;
+    }
+
+    .main-content {
+      margin-left: 260px;
+      min-height: 100vh;
+    }
+
+    .top-bar {
+      background: #fff;
+      padding: 1rem 2rem;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: var(--card-shadow);
+    }
+
+    .top-bar h1 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--sidebar-bg);
+      margin: 0;
+    }
+
+    .content-area {
+      padding: 2rem;
+    }
+
+    .stat-card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 1.5rem;
+      box-shadow: var(--card-shadow);
+      border-left: 4px solid var(--accent);
+    }
+
+    .stat-card .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--header-bg);
+    }
+
+    .stat-card .stat-label {
+      color: #64748b;
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .data-card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: var(--card-shadow);
+      overflow: hidden;
+    }
+
+    .data-card-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .data-card-header h2 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--sidebar-bg);
+      margin: 0;
+    }
+
+    .table thead th {
+      background: #f8fafc;
+      color: #475569;
+      font-weight: 600;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border-bottom: 2px solid #e2e8f0;
+      white-space: nowrap;
+    }
+
+    .table tbody td {
+      vertical-align: middle;
+      color: #334155;
+    }
+
+    .badge-available {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .badge-unavailable {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .badge-active {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .badge-overdue {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .section-panel {
+      display: none;
+    }
+
+    .section-panel.active {
+      display: block;
+    }
+
+    .loading-spinner {
+      text-align: center;
+      padding: 3rem;
+      color: #64748b;
+    }
+
+    .alert-floating {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 2000;
+      min-width: 300px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .sidebar-toggle {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--sidebar-bg);
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .main-content {
+        margin-left: 0;
+      }
+
+      .sidebar-toggle {
+        display: block;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Login Page -->
+  <div id="login-page">
+    <div class="login-card">
+      <div class="login-header">
+        <i class="bi bi-book-half"></i>
+        <h4 class="mb-1">Library Management System</h4>
+        <p class="mb-0 opacity-75 small">Sign in to access the dashboard</p>
+      </div>
+      <div class="login-body">
+        <form id="login-form">
+          <div class="mb-3">
+            <label for="username" class="form-label fw-semibold">Username</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-person"></i></span>
+              <input type="text" class="form-control" id="username" placeholder="Enter username" required autocomplete="username">
+            </div>
+          </div>
+          <div class="mb-4">
+            <label for="password" class="form-label fw-semibold">Password</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-lock"></i></span>
+              <input type="password" class="form-control" id="password" placeholder="Enter password" required autocomplete="current-password">
+            </div>
+          </div>
+          <div id="login-error" class="alert alert-danger d-none py-2" role="alert"></div>
+          <button type="submit" class="btn btn-primary btn-login w-100" id="login-btn">
+            <span id="login-btn-text">Sign In</span>
+            <span id="login-btn-spinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
+          </button>
+        </form>
+        <p class="text-muted text-center mt-3 mb-0 small">Default librarian: <code>admin</code> / <code>admin123</code></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main App -->
+  <div id="app-page">
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <i class="bi bi-book-half"></i>
+        <span>Library System</span>
+      </div>
+      <div class="sidebar-nav">
+        <a class="nav-link active" data-section="dashboard">
+          <i class="bi bi-speedometer2"></i> Dashboard
+        </a>
+        <a class="nav-link" data-section="books">
+          <i class="bi bi-journal-text"></i> Books
+        </a>
+        <a class="nav-link" data-section="members">
+          <i class="bi bi-people"></i> Members
+        </a>
+        <a class="nav-link" data-section="loans">
+          <i class="bi bi-arrow-left-right"></i> Active Loans
+        </a>
+      </div>
+      <div class="sidebar-footer">
+        <div class="user-info">
+          Signed in as
+          <strong id="sidebar-username">—</strong>
+          <span class="badge bg-secondary mt-1" id="sidebar-role">—</span>
+        </div>
+        <button class="btn btn-outline-light btn-sm w-100" id="logout-btn">
+          <i class="bi bi-box-arrow-right"></i> Logout
+        </button>
+      </div>
+    </nav>
+
+    <div class="main-content">
+      <div class="top-bar">
+        <div class="d-flex align-items-center gap-3">
+          <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle sidebar">
+            <i class="bi bi-list"></i>
+          </button>
+          <h1 id="page-title">Dashboard</h1>
+        </div>
+        <span class="text-muted small" id="current-date"></span>
+      </div>
+
+      <div class="content-area">
+
+        <!-- Dashboard -->
+        <div id="section-dashboard" class="section-panel active">
+          <div class="row g-4 mb-4">
+            <div class="col-md-4">
+              <div class="stat-card">
+                <div class="stat-value" id="stat-books">—</div>
+                <div class="stat-label">Total Books</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="stat-card">
+                <div class="stat-value" id="stat-members">—</div>
+                <div class="stat-label">Members</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="stat-card">
+                <div class="stat-value" id="stat-loans">—</div>
+                <div class="stat-label">Active Loans</div>
+              </div>
+            </div>
+          </div>
+          <div class="data-card">
+            <div class="data-card-header">
+              <h2><i class="bi bi-info-circle me-2"></i>Welcome</h2>
+            </div>
+            <div class="p-4">
+              <p class="mb-2">Use the sidebar to navigate between sections:</p>
+              <ul class="mb-0">
+                <li><strong>Books</strong> — Browse the full catalog</li>
+                <li><strong>Members</strong> — View registered library members</li>
+                <li><strong>Active Loans</strong> — Monitor currently borrowed items</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Books -->
+        <div id="section-books" class="section-panel">
+          <div class="data-card">
+            <div class="data-card-header">
+              <h2><i class="bi bi-journal-text me-2"></i>Book Catalog</h2>
+              <button class="btn btn-sm btn-outline-primary" id="refresh-books">
+                <i class="bi bi-arrow-clockwise"></i> Refresh
+              </button>
+            </div>
+            <div id="books-content">
+              <div class="loading-spinner">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="mt-2 mb-0">Loading books…</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Members -->
+        <div id="section-members" class="section-panel">
+          <div class="data-card">
+            <div class="data-card-header">
+              <h2><i class="bi bi-people me-2"></i>Members</h2>
+              <button class="btn btn-sm btn-outline-primary" id="refresh-members">
+                <i class="bi bi-arrow-clockwise"></i> Refresh
+              </button>
+            </div>
+            <div id="members-content">
+              <div class="loading-spinner">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="mt-2 mb-0">Loading members…</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Loans -->
+        <div id="section-loans" class="section-panel">
+          <div class="data-card">
+            <div class="data-card-header">
+              <h2><i class="bi bi-arrow-left-right me-2"></i>Active Loans</h2>
+              <button class="btn btn-sm btn-outline-primary" id="refresh-loans">
+                <i class="bi bi-arrow-clockwise"></i> Refresh
+              </button>
+            </div>
+            <div id="loans-content">
+              <div class="loading-spinner">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="mt-2 mb-0">Loading loans…</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const API_BASE = 'http://127.0.0.1:8000';
+
+    const state = {
+      token: localStorage.getItem('lms_token') || null,
+      username: localStorage.getItem('lms_username') || null,
+      role: localStorage.getItem('lms_role') || null,
+      authors: {},
+      books: [],
+      members: [],
+      loans: [],
+    };
+
+    // ── API helpers ──────────────────────────────────────────────
+
+    async function apiFetch(path, options = {}) {
+      const headers = { ...(options.headers || {}) };
+
+      if (state.token) {
+        headers['Authorization'] = `Bearer ${state.token}`;
+      }
+
+      if (options.body && !(options.body instanceof FormData)) {
+        headers['Content-Type'] = 'application/json';
+      }
+
+      const response = await fetch(`${API_BASE}${path}`, { ...options, headers });
+
+      if (response.status === 401) {
+        logout();
+        throw new Error('Session expired. Please sign in again.');
+      }
+
+      if (!response.ok) {
+        let detail = `Request failed (${response.status})`;
+        try {
+          const err = await response.json();
+          detail = err.detail || detail;
+          if (Array.isArray(detail)) detail = detail.map(d => d.msg).join(', ');
+        } catch (_) { /* ignore */ }
+        throw new Error(detail);
+      }
+
+      if (response.status === 204) return null;
+      return response.json();
+    }
+
+    async function login(username, password) {
+      const form = new URLSearchParams();
+      form.append('username', username);
+      form.append('password', password);
+
+      const response = await fetch(`${API_BASE}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: form.toString(),
+      });
+
+      if (!response.ok) {
+        let detail = 'Invalid username or password';
+        try {
+          const err = await response.json();
+          detail = err.detail || detail;
+        } catch (_) { /* ignore */ }
+        throw new Error(detail);
+      }
+
+      const data = await response.json();
+      state.token = data.access_token;
+
+      const payload = JSON.parse(atob(state.token.split('.')[1]));
+      state.username = payload.sub;
+      state.role = payload.role;
+
+      localStorage.setItem('lms_token', state.token);
+      localStorage.setItem('lms_username', state.username);
+      localStorage.setItem('lms_role', state.role);
+    }
+
+    function logout() {
+      state.token = null;
+      state.username = null;
+      state.role = null;
+      localStorage.removeItem('lms_token');
+      localStorage.removeItem('lms_username');
+      localStorage.removeItem('lms_role');
+      document.getElementById('app-page').style.display = 'none';
+      document.getElementById('login-page').style.display = 'flex';
+    }
+
+    // ── UI helpers ───────────────────────────────────────────────
+
+    function showToast(message, type = 'danger') {
+      const container = document.getElementById('toast-container');
+      const el = document.createElement('div');
+      el.className = `alert alert-${type} alert-floating alert-dismissible fade show`;
+      el.innerHTML = `${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>`;
+      container.appendChild(el);
+      setTimeout(() => el.remove(), 5000);
+    }
+
+    function formatDate(iso) {
+      if (!iso) return '—';
+      return new Date(iso).toLocaleDateString(undefined, {
+        year: 'numeric', month: 'short', day: 'numeric',
+      });
+    }
+
+    function isOverdue(dueDate) {
+      return new Date(dueDate) < new Date();
+    }
+
+    function renderTable(containerId, html) {
+      document.getElementById(containerId).innerHTML = html;
+    }
+
+    function renderEmptyState(message) {
+      return `<div class="text-center py-5 text-muted"><i class="bi bi-inbox fs-1 d-block mb-2"></i>${message}</div>`;
+    }
+
+    function renderErrorState(message) {
+      return `<div class="alert alert-warning m-3"><i class="bi bi-exclamation-triangle me-2"></i>${message}</div>`;
+    }
+
+    // ── Navigation ───────────────────────────────────────────────
+
+    const sectionTitles = {
+      dashboard: 'Dashboard',
+      books: 'Books',
+      members: 'Members',
+      loans: 'Active Loans',
+    };
+
+    function navigateTo(section) {
+      document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById(`section-${section}`).classList.add('active');
+
+      document.querySelectorAll('.sidebar-nav .nav-link').forEach(l => l.classList.remove('active'));
+      document.querySelector(`.sidebar-nav .nav-link[data-section="${section}"]`).classList.add('active');
+
+      document.getElementById('page-title').textContent = sectionTitles[section] || section;
+      document.getElementById('sidebar').classList.remove('open');
+
+      if (section === 'books') loadBooks();
+      if (section === 'members') loadMembers();
+      if (section === 'loans') loadLoans();
+      if (section === 'dashboard') loadDashboardStats();
+    }
+
+    // ── Data loading ─────────────────────────────────────────────
+
+    async function loadAuthors() {
+      try {
+        const authors = await apiFetch('/authors/');
+        state.authors = {};
+        authors.forEach(a => { state.authors[a.id] = a.name; });
+      } catch (_) {
+        state.authors = {};
+      }
+    }
+
+    async function loadBooks() {
+      renderTable('books-content', `<div class="loading-spinner"><div class="spinner-border text-primary"></div><p class="mt-2 mb-0">Loading books…</p></div>`);
+      try {
+        await loadAuthors();
+        const books = await apiFetch('/books/');
+        state.books = books;
+
+        if (!books.length) {
+          renderTable('books-content', renderEmptyState('No books in the catalog yet.'));
+          return;
+        }
+
+        const rows = books.map(b => {
+          const available = b.available_copies > 0;
+          return `<tr>
+            <td>${b.id}</td>
+            <td><strong>${escapeHtml(b.title)}</strong></td>
+            <td>${escapeHtml(state.authors[b.author_id] || `Author #${b.author_id}`)}</td>
+            <td><code>${escapeHtml(b.isbn)}</code></td>
+            <td>${escapeHtml(b.category || '—')}</td>
+            <td>${b.available_copies} / ${b.total_copies}</td>
+            <td><span class="badge ${available ? 'badge-available' : 'badge-unavailable'}">${available ? 'Available' : 'Unavailable'}</span></td>
+          </tr>`;
+        }).join('');
+
+        renderTable('books-content', `
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead><tr>
+                <th>ID</th><th>Title</th><th>Author</th><th>ISBN</th><th>Category</th><th>Copies</th><th>Status</th>
+              </tr></thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>`);
+      } catch (err) {
+        renderTable('books-content', renderErrorState(err.message));
+      }
+    }
+
+    async function loadMembers() {
+      renderTable('members-content', `<div class="loading-spinner"><div class="spinner-border text-primary"></div><p class="mt-2 mb-0">Loading members…</p></div>`);
+      try {
+        const members = await apiFetch('/members/');
+        state.members = members;
+
+        if (!members.length) {
+          renderTable('members-content', renderEmptyState('No members registered yet.'));
+          return;
+        }
+
+        const rows = members.map(m => `<tr>
+          <td>${m.id}</td>
+          <td><strong>${escapeHtml(m.username)}</strong></td>
+          <td>${escapeHtml(m.email)}</td>
+          <td><span class="badge bg-secondary">${escapeHtml(m.role)}</span></td>
+        </tr>`).join('');
+
+        renderTable('members-content', `
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead><tr>
+                <th>ID</th><th>Username</th><th>Email</th><th>Role</th>
+              </tr></thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>`);
+      } catch (err) {
+        if (state.role !== 'librarian') {
+          renderTable('members-content', renderErrorState('Members list requires librarian access. Please sign in as a librarian.'));
+        } else {
+          renderTable('members-content', renderErrorState(err.message));
+        }
+      }
+    }
+
+    async function loadLoans() {
+      renderTable('loans-content', `<div class="loading-spinner"><div class="spinner-border text-primary"></div><p class="mt-2 mb-0">Loading loans…</p></div>`);
+      try {
+        if (state.role === 'librarian') {
+          state.loans = await apiFetch('/api/loans/active');
+        } else {
+          const all = await apiFetch('/api/loans/me');
+          state.loans = all.filter(l => l.status === 'active');
+        }
+
+        if (!state.books.length) {
+          try { state.books = await apiFetch('/books/'); } catch (_) { /* ignore */ }
+        }
+
+        const bookMap = {};
+        state.books.forEach(b => { bookMap[b.id] = b.title; });
+
+        const memberMap = {};
+        if (state.role === 'librarian') {
+          try {
+            if (!state.members.length) state.members = await apiFetch('/members/');
+            state.members.forEach(m => { memberMap[m.id] = m.username; });
+          } catch (_) { /* ignore */ }
+        }
+
+        if (!state.loans.length) {
+          renderTable('loans-content', renderEmptyState('No active loans at the moment.'));
+          return;
+        }
+
+        const rows = state.loans.map(l => {
+          const overdue = isOverdue(l.due_date);
+          return `<tr>
+            <td>${l.id}</td>
+            <td>${escapeHtml(memberMap[l.user_id] || `User #${l.user_id}`)}</td>
+            <td>${escapeHtml(bookMap[l.book_id] || `Book #${l.book_id}`)}</td>
+            <td>${formatDate(l.borrowed_at)}</td>
+            <td>${formatDate(l.due_date)}</td>
+            <td><span class="badge ${overdue ? 'badge-overdue' : 'badge-active'}">${overdue ? 'Overdue' : 'Active'}</span></td>
+          </tr>`;
+        }).join('');
+
+        renderTable('loans-content', `
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead><tr>
+                <th>ID</th><th>Member</th><th>Book</th><th>Borrowed</th><th>Due Date</th><th>Status</th>
+              </tr></thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>`);
+      } catch (err) {
+        renderTable('loans-content', renderErrorState(err.message));
+      }
+    }
+
+    async function loadDashboardStats() {
+      try {
+        const books = await apiFetch('/books/');
+        document.getElementById('stat-books').textContent = books.length;
+      } catch (_) {
+        document.getElementById('stat-books').textContent = '—';
+      }
+
+      try {
+        if (state.role === 'librarian') {
+          const members = await apiFetch('/members/');
+          document.getElementById('stat-members').textContent = members.length;
+        } else {
+          document.getElementById('stat-members').textContent = '—';
+        }
+      } catch (_) {
+        document.getElementById('stat-members').textContent = '—';
+      }
+
+      try {
+        if (state.role === 'librarian') {
+          const loans = await apiFetch('/api/loans/active');
+          document.getElementById('stat-loans').textContent = loans.length;
+        } else {
+          const myLoans = await apiFetch('/api/loans/me');
+          document.getElementById('stat-loans').textContent = myLoans.filter(l => l.status === 'active').length;
+        }
+      } catch (_) {
+        document.getElementById('stat-loans').textContent = '—';
+      }
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function showApp() {
+      document.getElementById('login-page').style.display = 'none';
+      document.getElementById('app-page').style.display = 'block';
+      document.getElementById('sidebar-username').textContent = state.username;
+      document.getElementById('sidebar-role').textContent = state.role;
+      navigateTo('dashboard');
+    }
+
+    // ── Event listeners ──────────────────────────────────────────
+
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('login-btn');
+      const btnText = document.getElementById('login-btn-text');
+      const spinner = document.getElementById('login-btn-spinner');
+      const errorEl = document.getElementById('login-error');
+
+      errorEl.classList.add('d-none');
+      btn.disabled = true;
+      btnText.textContent = 'Signing in…';
+      spinner.classList.remove('d-none');
+
+      try {
+        await login(
+          document.getElementById('username').value.trim(),
+          document.getElementById('password').value
+        );
+        showApp();
+      } catch (err) {
+        errorEl.textContent = err.message;
+        errorEl.classList.remove('d-none');
+      } finally {
+        btn.disabled = false;
+        btnText.textContent = 'Sign In';
+        spinner.classList.add('d-none');
+      }
+    });
+
+    document.getElementById('logout-btn').addEventListener('click', logout);
+
+    document.querySelectorAll('.sidebar-nav .nav-link').forEach(link => {
+      link.addEventListener('click', () => navigateTo(link.dataset.section));
+    });
+
+    document.getElementById('refresh-books').addEventListener('click', loadBooks);
+    document.getElementById('refresh-members').addEventListener('click', loadMembers);
+    document.getElementById('refresh-loans').addEventListener('click', loadLoans);
+
+    document.getElementById('sidebar-toggle').addEventListener('click', () => {
+      document.getElementById('sidebar').classList.toggle('open');
+    });
+
+    document.getElementById('current-date').textContent = new Date().toLocaleDateString(undefined, {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+    });
+
+    // ── Init ─────────────────────────────────────────────────────
+
+    if (state.token) {
+      try {
+        const payload = JSON.parse(atob(state.token.split('.')[1]));
+        if (payload.exp * 1000 > Date.now()) {
+          showApp();
+        } else {
+          logout();
+        }
+      } catch (_) {
+        logout();
+      }
+    }
+  </script>
+</body>
+</html>
